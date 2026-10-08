@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quotible — Global Settings · Payment Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif; }
+
+    /* ── Toggle ───────────────────────────────────────────── */
+    .toggle { position: relative; display: inline-block; width: 56px; height: 28px; border-radius: 9999px; vertical-align: middle; }
+    .toggle .knob { position: absolute; top: 4px; width: 20px; height: 20px; border-radius: 9999px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+    .toggle .lbl  { position: absolute; top: 50%; transform: translateY(-50%); font-size: 10px; font-weight: 700; letter-spacing: .03em; color: #fff; }
+    .toggle.on  { background: #16B364; }
+    .toggle.on  .knob { right: 4px; }
+    .toggle.on  .lbl  { left: 9px; }
+    .toggle.off { background: #C4C8CF; }
+    .toggle.off .knob { left: 4px; }
+    .toggle.off .lbl  { right: 9px; }
+
+    /* ── Segmented control ────────────────────────────────── */
+    .seg { display: flex; width: 100%; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden; background: #fff; }
+    .seg > div { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; color: #0F1D3A; border-left: 1px solid #E5E7EB; cursor: default; }
+    .seg > div:first-child { border-left: 0; }
+    .seg > div.sel { background: #2563EB; color: #fff; font-weight: 600; }
+
+    /* ── Inputs ───────────────────────────────────────────── */
+    .inp     { width: 100%; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #4B5563; }
+    .inp-lbl { font-size: 12px; color: #0F1D3A; font-weight: 600; margin-bottom: 6px; display: block; }
+
+    /* ── Radio ────────────────────────────────────────────── */
+    .rad { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #0F1D3A; }
+    .rad .dot { width: 18px; height: 18px; border-radius: 9999px; border: 2px solid #C4C8CF; display: inline-block; position: relative; flex: none; }
+    .rad.sel .dot { border-color: #2563EB; }
+    .rad.sel .dot:after { content: ""; position: absolute; inset: 3px; border-radius: 9999px; background: #2563EB; }
+
+    /* ── Form rows ────────────────────────────────────────── */
+    .row { padding: 22px 0; border-bottom: 1px solid #EEF0F2; }
+    .row:last-child { border-bottom: 0; }
+    .q   { font-size: 14px; font-weight: 700; color: #0F1D3A; }
+
+    /* ── Links ────────────────────────────────────────────── */
+    .lnk  { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #0F1D3A; font-weight: 600; }
+    .lnk-blue { color: #2563EB; }
+
+    /* ── Sidebar ──────────────────────────────────────────── */
+    .nav-top   { font-size: 13px; font-weight: 700; color: #0F1D3A; padding: 10px 16px; }
+    .nav-group { font-size: 13px; font-weight: 700; color: #0F1D3A; padding: 14px 16px 4px; }
+    .nav-sub   { font-size: 13px; color: #6B7280; padding: 6px 16px 6px 16px; }
+    .nav-active { background: #F3F4F6; border-left: 3px solid #16B364; }
+
+    /* ── Make pills ───────────────────────────────────────── */
+    .pill { border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px 16px; font-size: 13px; color: #0F1D3A; }
+    .pill.sel { border-color: #0F1D3A; font-weight: 600; }
+
+    /* ── Rate table cells ─────────────────────────────────── */
+    .rate-cell  { background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px 0; text-align: center; font-size: 13px; color: #4B5563; }
+    .score-cell { background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px 10px; text-align: center; font-size: 13px; color: #4B5563; width: 54px; }
+    .step-btn   { width: 28px; height: 28px; border: 1px solid #E5E7EB; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: #6B7280; background:#fff; }
+  </style>
+</head>
+
+<body class="bg-[#EEF1F5]">
+
+  <!-- ═══════════════════════ TOP NAV ═══════════════════════ -->
+  <header class="bg-[#0A1633] h-12 flex items-center justify-between px-6 sticky top-0 z-30">
+    <div class="text-white h-4">
+      <!-- Quotible logo (QMark gradient + currentColor wordmark) -->
+      <svg height="16" viewBox="0 0 1696 385" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <mask id="qmark" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="93" width="187" height="220">
+          <path d="M0 173.6C0 168.04 2.17602 162.707 6.04937 158.776C9.92272 154.844 15.1761 152.635 20.6539 152.635H165.554C171.032 152.635 176.285 154.844 180.159 158.776C184.032 162.707 186.208 168.04 186.208 173.6C186.208 176.352 185.674 179.077 184.635 181.62C183.597 184.162 182.076 186.471 180.157 188.416C178.239 190.361 175.962 191.903 173.456 192.954C170.951 194.005 168.265 194.545 165.554 194.542H20.6539C17.9426 194.545 15.2574 194.005 12.7517 192.954C10.246 191.903 7.96896 190.361 6.05077 188.416C4.13258 186.471 2.61087 184.162 1.57263 181.62C0.534393 179.077 0 176.352 0 173.6ZM165.554 312.077C171.032 312.077 176.285 309.868 180.159 305.937C184.032 302.005 186.208 296.672 186.208 291.112C186.208 285.552 184.032 280.219 180.159 276.288C176.285 272.356 171.032 270.147 165.554 270.147C162.843 270.147 160.158 270.69 157.654 271.743C155.149 272.797 152.874 274.342 150.958 276.289C149.042 278.236 147.523 280.547 146.487 283.091C145.452 285.634 144.92 288.36 144.924 291.112C144.924 296.668 147.096 301.997 150.965 305.928C154.833 309.859 160.081 312.071 165.554 312.077ZM44.3111 135.774H165.554C168.265 135.777 170.951 135.238 173.456 134.187C175.962 133.136 178.239 131.594 180.157 129.649C182.076 127.704 183.597 125.394 184.635 122.852C185.674 120.31 186.208 117.585 186.208 114.832C186.208 109.272 184.032 103.94 180.159 100.008C176.285 96.0762 171.032 93.8674 165.554 93.8674H44.3111C38.8333 93.8674 33.5799 96.0762 29.7066 100.008C25.8332 103.94 23.6572 109.272 23.6572 114.832C23.6572 117.585 24.1916 120.31 25.2298 122.852C26.2681 125.394 27.7898 127.704 29.708 129.649C31.6262 131.594 33.9032 133.136 36.4089 134.187C38.9146 135.238 41.5999 135.777 44.3111 135.774ZM83.5857 253.309H165.554C171.032 253.309 176.285 251.101 180.159 247.169C184.032 243.237 186.208 237.905 186.208 232.344C186.208 229.592 185.674 226.867 184.635 224.325C183.597 221.783 182.076 219.473 180.157 217.528C178.239 215.583 175.962 214.041 173.456 212.99C170.951 211.939 168.265 211.4 165.554 211.403H83.7012C80.99 211.4 78.3048 211.939 75.7991 212.99C73.2934 214.041 71.0164 215.583 69.0982 217.528C67.18 219.473 65.6583 221.783 64.62 224.325C63.5818 226.867 63.0474 229.592 63.0474 232.344C63.0474 237.905 65.2234 243.237 69.0968 247.169C72.9701 251.101 78.2235 253.309 83.7012 253.309H83.5857Z" fill="white"/>
+        </mask>
+        <g mask="url(#qmark)"><path d="M191.883 90.3348L-10.4482 91.4102L-9.29581 314.823L193.035 313.747L191.883 90.3348Z" fill="url(#qgrad)"/></g>
+        <path d="M455.914 103.774C455.966 100.539 455.896 94.5248 447.464 93.6891C443.013 93.1885 438.536 92.9553 434.057 92.9909C429.491 92.9766 424.928 93.2259 420.389 93.7374C415.622 94.3129 412.216 96.0211 411.148 101.8L409.138 112.876L407.331 112.847C406.903 112.872 406.473 112.865 406.046 112.827C405.8 112.661 405.565 112.479 405.341 112.284L404.473 111.521C397.855 105.837 380.255 90.7264 339.786 90.7771C274.738 91.0127 237.54 131.831 237.561 203.12C237.622 273.42 273.964 314.091 337.35 315.108L340.038 315.152C378.104 315.087 396.159 301.901 403.839 296.277L405.62 294.977C406.391 294.386 406.606 294.293 406.654 294.294C407.018 294.267 407.385 294.273 407.748 294.311L409.199 294.334L409.291 373.062C409.207 378.301 410.602 381.777 417.151 382.848C421.381 383.436 425.643 383.747 429.912 383.778L432.766 383.823C438.015 383.881 443.26 383.546 448.461 382.82C454.926 381.716 456.219 378.235 456.208 372.97L455.914 103.774ZM348.855 277.186L346.762 277.152C304.497 276.473 284.772 252.877 284.716 203.056C284.65 152.342 304.945 128.518 348.673 128.472L350.766 128.505C393.032 129.184 412.778 152.877 412.832 202.867C412.876 253.485 392.56 277.114 348.855 277.186Z" fill="currentColor"/>
+        <path d="M677.889 103.227C677.948 97.9879 676.536 94.5189 670.053 93.4802C664.875 92.7968 659.655 92.4961 654.434 92.5804C649.185 92.5659 643.941 92.9347 638.744 93.6841C632.284 94.8189 631.007 98.4267 631.044 103.571L631.642 204.997C631.938 254.865 615.794 275.306 575.92 275.583C557.601 275.691 545.589 271.282 538.014 261.659C530.836 252.547 527.427 238.431 527.308 217.228L526.649 104.306C526.708 99.0424 525.296 95.5735 518.741 94.5581C513.562 93.8958 508.342 93.6032 503.122 93.6824C497.873 93.6692 492.629 94.038 487.432 94.7861C480.973 95.9209 479.695 99.5287 479.733 104.648L480.465 227.979C480.626 258.165 488.815 280.907 504.779 295.623C518.648 308.384 538.223 315.003 563.032 315.282L565.649 315.311C584.04 315.18 609.898 310.979 628.694 291.654C628.881 291.456 629.082 291.273 629.295 291.106C629.755 291.065 630.217 291.071 630.675 291.121L632.15 291.138L634.393 303.237C635.512 309.455 638.545 310.527 643.105 311.207C647.828 311.893 652.598 312.197 657.369 312.115C661.869 312.157 666.363 311.787 670.798 311.01C677.76 309.616 678.934 306.779 678.881 300.911L677.889 103.227Z" fill="currentColor"/>
+        <path d="M894.157 118.522C874.746 99.3981 846.32 90.0294 809.425 90.7055C772.53 91.3816 744.461 101.716 725.716 121.492C707.376 140.809 698.384 168.915 699.003 204.844C699.621 240.774 709.564 268.469 728.571 287.182C747.577 305.896 774.624 315.047 809.734 315.047H813.279C850.055 314.395 878.219 303.988 896.988 284.14C915.352 264.823 924.344 236.717 923.725 200.884C923.107 165.051 913.163 137.235 894.157 118.522ZM812.636 277.307C768.153 278.152 747.03 254.802 746.15 203.999C745.722 179.563 750.146 161.671 759.661 149.26C770.104 135.617 786.589 128.808 810.091 128.398H812.232C855.264 128.398 875.722 151.747 876.459 201.729C877.434 252.509 857.12 276.534 812.636 277.307Z" fill="currentColor"/>
+        <path d="M1063.76 277.74C1062.95 272.898 1060.54 270.447 1056.59 270.388L1056.4 270.385C1055.59 270.381 1054.79 270.499 1054.02 270.735L1053.42 270.726C1044.59 272.806 1035.56 273.908 1026.49 274.016C1012.02 274.064 1005.11 271.931 999.382 266.846C992.785 260.951 989.685 250.424 989.651 233.712L989.436 134.24C989.442 133.829 989.445 133.612 989.445 133.612C989.74 133.494 990.059 133.449 990.375 133.481L1053.45 133.296C1056.78 133.346 1061.28 132.52 1062.19 126.038C1062.7 121.876 1062.93 117.684 1062.9 113.491C1062.93 109.297 1062.67 105.106 1062.14 100.946C1061.22 94.4365 1056.66 93.6193 1053.38 93.7147L990.281 93.8756C989.981 93.911 989.677 93.9065 989.377 93.862C989.344 93.6376 989.347 93.4092 989.388 93.186L989.229 43.6785C989.308 38.4152 987.909 34.9409 981.359 33.9004C976.184 33.1942 970.964 32.8815 965.743 32.965C960.494 32.9105 955.249 33.2513 950.049 33.9845C943.585 35.1187 942.294 38.6975 942.312 43.8414L942.715 238.294C942.762 265.148 951.544 291.844 976.526 304.295C991.354 311.763 1008.31 313.95 1024.66 313.351C1033.09 313.031 1041.48 311.986 1049.74 310.227C1056.61 308.761 1063.88 308.025 1064.88 299.733C1065.1 297.624 1065.18 295.505 1065.14 293.385C1065.11 288.14 1064.65 282.907 1063.76 277.74Z" fill="currentColor"/>
+        <path d="M1110.85 54.6869L1111.45 54.697C1115.01 54.8088 1118.57 54.1841 1121.89 52.8608C1125.21 51.5374 1128.24 49.543 1130.78 46.9983C1133.32 44.4537 1135.33 41.412 1136.67 38.0575C1138.02 34.703 1138.69 31.1056 1138.63 27.4836C1138.62 20.3074 1135.8 13.4301 1130.8 8.36369C1125.79 3.29723 1119.01 0.456286 1111.94 0.465404L1111.54 0.458531C1104.29 0.366884 1097.3 3.20162 1092.11 8.33915C1089.63 10.8595 1087.67 13.853 1086.34 17.1465C1085.01 20.4401 1084.34 23.9683 1084.36 27.5271C1084.28 31.0945 1084.9 34.6416 1086.2 37.9566C1087.5 41.2716 1089.45 44.2866 1091.92 46.8216C1094.39 49.3566 1097.34 51.3595 1100.6 52.7109C1103.85 54.0622 1107.34 54.7343 1110.85 54.6869Z" fill="currentColor"/>
+        <path d="M1126.6 94.0525C1121.43 93.3356 1116.21 93.0128 1110.99 93.0867C1105.74 93.022 1100.49 93.3526 1095.29 94.0757C1088.83 95.1733 1087.53 98.6529 1087.51 103.917L1087.55 301.945C1087.46 307.208 1088.85 310.685 1095.4 311.738C1099.61 312.317 1103.86 312.631 1108.11 312.678L1110.99 312.727C1116.24 312.785 1121.49 312.446 1126.69 311.714C1133.15 310.617 1134.45 307.161 1134.44 301.896L1134.43 103.87C1134.45 98.6293 1133.15 95.1539 1126.6 94.0525Z" fill="currentColor"/>
+        <path d="M1349.3 115.425C1331.8 98.905 1307.53 90.5797 1277.15 90.5809C1248.6 90.6125 1226.72 97.5653 1210.35 111.71L1210.13 111.875L1208.9 112.845L1208.21 112.834L1208.17 12.3712C1208.26 7.13218 1206.87 3.6556 1200.32 2.58056C1195.14 1.86904 1189.93 1.53999 1184.7 1.59602C1179.46 1.55223 1174.21 1.89262 1169.01 2.61454C1162.54 3.71432 1161.25 7.19442 1161.26 12.4591L1161.4 301.168C1161.3 307.059 1162.63 310.1 1169.6 311.448C1174.03 312.187 1178.51 312.521 1183 312.444C1187.78 312.497 1192.56 312.157 1197.29 311.426C1201.8 310.607 1205.08 309.551 1206.13 303.435L1208.14 292.794L1209.97 292.825C1211.45 292.849 1211.47 292.85 1212.18 293.417C1229.37 307.951 1249.01 314.461 1277.36 314.933L1280.98 314.993C1309.53 314.961 1333.81 305.634 1350.83 288.022C1369.9 268.248 1379.57 239.164 1379.55 201.563C1379.55 163.286 1369.37 134.354 1349.3 115.425ZM1268.67 276.994C1245.57 277.044 1229.26 270.614 1218.82 257.4C1209.24 245.166 1204.57 227.41 1204.57 202.826C1204.58 178.242 1209.21 160.328 1218.76 148.123C1229.21 134.797 1245.5 128.331 1268.58 128.304L1270.67 128.339C1312.93 129.043 1332.64 152.724 1332.69 202.738C1332.68 253.355 1312.35 276.949 1268.67 276.994Z" fill="currentColor"/>
+        <path d="M1472.96 279.247C1472.06 272.734 1467.51 271.902 1464.22 271.986L1447.93 271.976C1447.81 272.064 1447.68 272.112 1447.54 272.112C1447.39 272.113 1447.26 272.065 1447.14 271.978C1447.03 271.89 1446.95 271.767 1446.91 271.629C1446.88 271.49 1446.89 271.342 1446.94 271.209L1447.14 12.2747C1447.24 7.01173 1445.85 3.53272 1439.33 2.47079C1434.15 1.74657 1428.92 1.41626 1423.69 1.48262C1418.45 1.41161 1413.21 1.73494 1408.02 2.44995C1401.55 3.53841 1400.22 7.13651 1400.22 12.2805L1399.9 272.638C1399.87 304.274 1413.47 311.069 1440.49 311.566L1443.82 311.628L1464.07 311.638C1467.39 311.699 1471.93 310.889 1472.83 304.41C1473.83 296.076 1473.84 287.653 1472.87 279.318L1472.96 279.247Z" fill="currentColor"/>
+        <path d="M1693.69 195.014C1693.86 128.144 1657.42 92.0497 1588.21 90.6937L1584.53 90.6214C1512.68 90.4695 1474.61 129.186 1474.44 202.577C1474.34 242.448 1486.11 272.046 1509.4 290.567C1529.08 306.24 1556.52 314.216 1593.22 314.935L1598.19 315.032C1634.92 315.1 1662.74 306.637 1672.2 301.992C1679.17 298.651 1679.46 295.903 1679.6 288.468C1679.59 281.861 1679.04 275.268 1677.97 268.753C1677.89 266.846 1677.08 265.046 1675.71 263.744C1674.34 262.442 1672.51 261.743 1670.63 261.798C1669.48 261.85 1668.34 262.047 1667.24 262.384L1665.73 262.886C1656.94 265.998 1630.18 275.424 1599.61 275.38C1550.79 275.293 1525.97 257.37 1523.57 220.59C1523.58 220.276 1523.58 220.059 1523.58 219.914C1523.92 219.894 1524.25 219.9 1524.58 219.933L1683.22 220.216C1687.6 220.302 1691.92 219.638 1692.73 212.457C1693.39 206.667 1693.71 200.843 1693.69 195.014ZM1646.01 183.744C1645.65 183.834 1645.27 183.875 1644.89 183.867L1524.32 183.63C1523.91 183.672 1523.51 183.664 1523.11 183.606L1523.12 182.761C1525.66 145.449 1546.22 127.353 1585.92 127.43C1625.63 127.508 1646.22 146.676 1646.13 182.877C1646.14 183.17 1646.1 183.464 1646.01 183.744Z" fill="currentColor"/>
+        <defs><linearGradient id="qgrad" x1="116.52" y1="311.774" x2="116.685" y2="87.1242" gradientUnits="userSpaceOnUse"><stop stop-color="#FF6700"/><stop offset="1" stop-color="#F7D21C"/></linearGradient></defs>
+      </svg>
+    </div>
+    <div class="flex items-center gap-2 text-white text-[13px] font-medium">
+      <span class="text-base leading-none">🇺🇸</span>
+      <span>Hi, Abhay M.</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </header>
+
+  <div class="flex">
+
+    <!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+    <aside class="w-[200px] shrink-0 bg-white border-r border-[#E5E7EB] sticky top-12 self-start h-[calc(100vh-48px)] overflow-y-auto py-3 flex flex-col">
+      <div class="nav-top nav-active">Global Settings</div>
+
+      <div class="nav-group">Lead Response</div>
+      <div class="nav-sub">CRM Templates</div>
+      <div class="nav-sub">CRM Supercharger</div>
+      <div class="nav-sub">Automation</div>
+      <div class="nav-sub">Notifications</div>
+
+      <div class="nav-group">Instant Quote</div>
+      <div class="nav-sub">Window Stickers</div>
+      <div class="nav-sub">VINdna</div>
+
+      <div class="nav-group">Quotible AI</div>
+      <div class="nav-sub">Dealership Profile &amp; Tone</div>
+      <div class="nav-sub">AI Lead Response</div>
+
+      <div class="nav-top">Users</div>
+      <div class="nav-top">Reports</div>
+      <div class="nav-top">Inventory</div>
+
+      <div class="px-3 mt-4">
+        <button class="w-full text-[13px] font-semibold text-[#2563EB] bg-[#E8F0FE] rounded-lg py-2.5">Back to Dashboard</button>
+      </div>
+    </aside>
+
+    <!-- ═══════════════════════ MAIN ═══════════════════════ -->
+    <main class="flex-1 px-8 py-8 pb-28">
+      <div class="max-w-[860px] mx-auto">
+
+        <!-- Title + breadcrumb -->
+        <h1 class="text-[22px] font-bold text-[#0F1D3A]">Global Settings</h1>
+        <div class="flex items-center gap-1.5 text-[12px] text-[#9CA3AF] mt-1.5">
+          <span>Dashboard</span><span>›</span><span>Settings</span><span>›</span><span class="text-[#0F1D3A] font-semibold">Global Settings</span>
+        </div>
+        <p class="text-[13px] text-[#6B7280] mt-3 leading-relaxed">
+          The information collected within this section will impact ALL Quotible responses.<br>
+          If you need to make specific changes to a template, you can do so in CRM Templates.
+        </p>
+
+        <!-- Stepper -->
+        <div class="flex items-start justify-between mt-8 mb-6 px-2">
+          <!-- step template: completed=green, current=green ring, future=gray -->
+          <div class="flex flex-col items-center w-[20%]">
+            <div class="w-8 h-8 rounded-full bg-[#16B364] text-white text-[13px] font-bold flex items-center justify-center">1</div>
+            <span class="text-[12px] text-[#16B364] font-medium mt-2 text-center">Dealership Settings</span>
+          </div>
+          <div class="flex-1 h-[2px] bg-[#16B364] mt-4"></div>
+          <div class="flex flex-col items-center w-[20%]">
+            <div class="w-8 h-8 rounded-full bg-[#16B364] text-white text-[13px] font-bold flex items-center justify-center">2</div>
+            <span class="text-[12px] text-[#16B364] font-medium mt-2 text-center">Template Assets</span>
+          </div>
+          <div class="flex-1 h-[2px] bg-[#16B364] mt-4"></div>
+          <div class="flex flex-col items-center w-[20%]">
+            <div class="w-8 h-8 rounded-full bg-[#16B364] text-white text-[13px] font-bold flex items-center justify-center">3</div>
+            <span class="text-[12px] text-[#16B364] font-medium mt-2 text-center">Video Content</span>
+          </div>
+          <div class="flex-1 h-[2px] bg-[#16B364] mt-4"></div>
+          <div class="flex flex-col items-center w-[20%]">
+            <div class="w-8 h-8 rounded-full bg-[#16B364] text-white text-[13px] font-bold flex items-center justify-center ring-4 ring-[#16B364]/20">4</div>
+            <span class="text-[12px] text-[#0F1D3A] font-bold mt-2 text-center">Payment Settings</span>
+          </div>
+          <div class="flex-1 h-[2px] bg-[#E5E7EB] mt-4"></div>
+          <div class="flex flex-col items-center w-[20%]">
+            <div class="w-8 h-8 rounded-full bg-white border border-[#D1D5DB] text-[#9CA3AF] text-[13px] font-bold flex items-center justify-center">5</div>
+            <span class="text-[12px] text-[#9CA3AF] font-medium mt-2 text-center">Additional Features</span>
+          </div>
+        </div>
+
+        <!-- ═══════════════ CARD ═══════════════ -->
+        <div class="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm px-10 py-8">
+
+          <h2 class="text-[18px] font-bold text-[#0F1D3A] mb-2">Payment Settings</h2>
+
+          <!-- Display equipment add-ons -->
+          <div class="row flex items-center justify-between">
+            <span class="q">Would you like to display equipment add-ons?</span>
+            <span class="toggle off"><span class="knob"></span><span class="lbl">NO</span></span>
+          </div>
+
+          <!-- Dealership fees global -->
+          <div class="row">
+            <div class="q mb-3">Would you like to add dealership fees to all quotes globally?</div>
+            <div class="flex items-center gap-5">
+              <span class="toggle on"><span class="knob"></span><span class="lbl">YES</span></span>
+              <a class="lnk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit Dealership Fees</a>
+            </div>
+          </div>
+
+          <!-- Accessories fees -->
+          <div class="row flex items-center justify-between">
+            <span class="q">Would you like to put in Accessories fees in the quotes?</span>
+            <span class="toggle off"><span class="knob"></span><span class="lbl">NO</span></span>
+          </div>
+
+          <!-- Zip code radios -->
+          <div class="row">
+            <div class="q mb-3">Would you like to use the dealership's zip code or the customers zip code for rebates &amp; incentives?</div>
+            <div class="flex items-center gap-8">
+              <span class="rad sel"><span class="dot"></span>Dealership Zip Code</span>
+              <span class="rad"><span class="dot"></span>Customer Zip Code</span>
+            </div>
+          </div>
+
+          <!-- Dealer cash -->
+          <div class="row flex items-center justify-between">
+            <span class="q">Would you like to include dealer cash?</span>
+            <span class="toggle off"><span class="knob"></span><span class="lbl">NO</span></span>
+          </div>
+
+          <!-- Payment options defaults -->
+          <div class="row">
+            <div class="q mb-5">Set your payment options defaults</div>
+            <div class="grid grid-cols-2 gap-10">
+              <!-- FINANCE -->
+              <div>
+                <div class="text-[11px] font-bold tracking-wider text-[#9CA3AF] mb-4">FINANCE</div>
+                <div class="space-y-4">
+                  <div>
+                    <div class="text-[12px] text-[#6B7280] mb-1.5">Manufacturer - Special APR (Deal 3)</div>
+                    <div class="seg"><div class="sel">1</div><div>2</div><div>3</div><div>4</div><div>OFF</div></div>
+                  </div>
+                  <div>
+                    <div class="text-[12px] text-[#6B7280] mb-1.5">Manufacturer - Standard APR (Deal 2)</div>
+                    <div class="seg"><div>1</div><div class="sel">2</div><div>3</div><div>4</div><div>OFF</div></div>
+                  </div>
+                  <div>
+                    <div class="text-[12px] text-[#6B7280] mb-1.5">Rate Card Standard (Deal 20)</div>
+                    <div class="seg"><div>1</div><div>2</div><div class="sel">3</div><div>4</div><div>OFF</div></div>
+                  </div>
+                  <div>
+                    <div class="text-[12px] text-[#6B7280] mb-1.5">Manufacturer - Alt APR</div>
+                    <div class="seg"><div>1</div><div>2</div><div>3</div><div>4</div><div class="sel">OFF</div></div>
+                  </div>
+                </div>
+              </div>
+              <!-- LEASE -->
+              <div>
+                <div class="text-[11px] font-bold tracking-wider text-[#9CA3AF] mb-4">LEASE</div>
+                <div class="space-y-4">
+                  <div>
+                    <div class="text-[12px] text-[#6B7280] mb-1.5">Manufacturer - Lease Special (Deal 9)</div>
+                    <div class="seg"><div class="sel">1</div><div>2</div><div>3</div><div>4</div><div>OFF</div></div>
+                  </div>
+                  <div>
+                    <div class="text-[12px] text-[#6B7280] mb-1.5">Manufacturer - Lease Standard (Deal 8)</div>
+                    <div class="seg"><div>1</div><div class="sel">2</div><div>3</div><div>4</div><div>OFF</div></div>
+                  </div>
+                  <div>
+                    <div class="text-[12px] text-[#6B7280] mb-1.5">Bank Lease (Deal 12)</div>
+                    <div class="seg"><div>1</div><div>2</div><div class="sel">3</div><div>4</div><div>OFF</div></div>
+                  </div>
+                  <div>
+                    <div class="text-[12px] text-[#6B7280] mb-1.5">Affiliate - Lease Standard (Deal 10)</div>
+                    <div class="seg"><div>1</div><div>2</div><div>3</div><div class="sel">4</div><div>OFF</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Default financing terms -->
+          <div class="row">
+            <div class="q mb-4">Please enter the default financing terms that should be selected by default.</div>
+            <div class="grid grid-cols-2 gap-6">
+              <div><label class="inp-lbl">Financing term</label><input class="inp" value="0"></div>
+              <div><label class="inp-lbl">Lease term</label><input class="inp" value="36"></div>
+            </div>
+          </div>
+
+          <!-- Default down payment -->
+          <div class="row">
+            <div class="q mb-3">Please enter the default down payment that should be selected by default.</div>
+            <div class="flex items-center gap-8 mb-4">
+              <span class="rad sel"><span class="dot"></span>Percentage</span>
+              <span class="rad"><span class="dot"></span>Amount</span>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+              <div><label class="inp-lbl">Finance Down Payment Percentage</label><input class="inp" value="5%"></div>
+              <div><label class="inp-lbl">Lease Down Payment Percentage</label><input class="inp" value="1%"></div>
+            </div>
+          </div>
+
+          <!-- Lease miles -->
+          <div class="row">
+            <div class="q mb-4">Please enter the lease miles that should be selected by default.</div>
+            <div><label class="inp-lbl">Lease Miles</label><input class="inp" value="10,500"></div>
+          </div>
+
+          <!-- Change field names in payment summary -->
+          <div class="row">
+            <div class="q mb-3">Would you like to change the names of the fields in the payment summary</div>
+            <div class="flex items-center gap-5">
+              <span class="toggle on"><span class="knob"></span><span class="lbl">YES</span></span>
+              <a class="lnk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit Payment Summary</a>
+            </div>
+          </div>
+
+          <!-- Include pricing in customer-facing emails / landing page -->
+          <div class="row">
+            <div class="flex items-center justify-between">
+              <span class="q">Would you like to include pricing in your emails and or landing page?</span>
+              <span class="toggle on toggle-btn" role="switch" aria-checked="true" data-target="pricing-line-items"><span class="knob"></span><span class="lbl">YES</span></span>
+            </div>
+
+            <!-- Revealed line items (shown when toggle = YES) -->
+            <div id="pricing-line-items" class="mt-5">
+              <div class="text-[11px] font-bold tracking-wider text-[#9CA3AF] mb-3">LINE ITEMS TO DISPLAY</div>
+              <div class="rounded-xl border border-[#E5E7EB] divide-y divide-[#EEF0F2] max-w-[460px]">
+                <div class="flex items-center justify-between px-4 py-3">
+                  <span class="text-[14px] text-[#0F1D3A]">MSRP/Retail Price</span>
+                  <span class="toggle on toggle-btn" role="switch" aria-checked="true"><span class="knob"></span><span class="lbl">YES</span></span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                  <span class="text-[14px] text-[#0F1D3A]">Invoice</span>
+                  <span class="toggle off toggle-btn" role="switch" aria-checked="false"><span class="knob"></span><span class="lbl">NO</span></span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                  <span class="text-[14px] text-[#0F1D3A]">Dealer Discount</span>
+                  <span class="toggle on toggle-btn" role="switch" aria-checked="true"><span class="knob"></span><span class="lbl">YES</span></span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                  <span class="text-[14px] text-[#0F1D3A]">Fees</span>
+                  <span class="toggle on toggle-btn" role="switch" aria-checked="true"><span class="knob"></span><span class="lbl">YES</span></span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                  <span class="text-[14px] text-[#0F1D3A]">Dealer Added Equipment</span>
+                  <span class="toggle on toggle-btn" role="switch" aria-checked="true"><span class="knob"></span><span class="lbl">YES</span></span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                  <span class="text-[14px] text-[#0F1D3A]">Total Rebates</span>
+                  <span class="toggle on toggle-btn" role="switch" aria-checked="true"><span class="knob"></span><span class="lbl">YES</span></span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                  <span class="text-[14px] text-[#0F1D3A]">Net Price</span>
+                  <span class="toggle on toggle-btn" role="switch" aria-checked="true"><span class="knob"></span><span class="lbl">YES</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARS Act Total Price Feature -->
+          <div class="row">
+            <div class="flex items-center justify-between">
+              <span class="q">CARS Act Total Price Feature</span>
+              <span class="toggle off toggle-btn" role="switch" aria-checked="false" data-target="cars-act-message"><span class="knob"></span><span class="lbl">NO</span></span>
+            </div>
+
+            <!-- Revealed message (shown when toggle = YES) -->
+            <div id="cars-act-message" class="mt-4" style="display:none">
+              <p class="text-[13px] text-[#6B7280] leading-relaxed max-w-[560px] mb-5">We will now display the total price for finance and lease payments.</p>
+
+              <div class="grid grid-cols-2 gap-10 max-w-[700px]">
+                <!-- FINANCE -->
+                <div>
+                  <div class="text-[11px] font-bold tracking-wider text-[#9CA3AF] mb-3">FINANCE</div>
+                  <div class="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] px-4 py-4">
+                    <div class="text-[13px] font-bold text-[#0F1D3A] mb-2">Total Finance Cost</div>
+                    <div class="text-[13px] text-[#0F1D3A] leading-relaxed">
+                      (Monthly Payment <span class="text-[#2563EB] font-semibold">&times;</span> Term)
+                      <span class="text-[#2563EB] font-semibold">+</span> Down Payment
+                      <span class="text-[#2563EB] font-semibold">+</span> Trade-In Equity <span class="text-[#9CA3AF]">(if applicable)</span>
+                    </div>
+                  </div>
+                  <p class="text-[12px] text-[#6B7280] leading-relaxed mt-3">
+                    The longer the term, the greater the total amount paid for financing over the life of the deal.
+                  </p>
+                </div>
+
+                <!-- LEASE -->
+                <div>
+                  <div class="text-[11px] font-bold tracking-wider text-[#9CA3AF] mb-3">LEASE</div>
+                  <div class="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] px-4 py-4">
+                    <div class="text-[13px] font-bold text-[#0F1D3A] mb-2">Total Lease Cost</div>
+                    <div class="text-[13px] text-[#0F1D3A] leading-relaxed">
+                      (Monthly Payment <span class="text-[#2563EB] font-semibold">&times;</span> Term)
+                      <span class="text-[#2563EB] font-semibold">+</span> Amount Due at Signing
+                      <span class="text-[#2563EB] font-semibold">&minus;</span> First Month's Payment
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Disable additional rebates -->
+          <div class="row flex items-center justify-between">
+            <span class="q">Would you like to disable the additional rebates in the Customer Facing Quote?</span>
+            <span class="toggle off"><span class="knob"></span><span class="lbl">NO</span></span>
+          </div>
+
+          <!-- Only allow one additional rebate -->
+          <div class="row flex items-center justify-between">
+            <span class="q">Only allow one "Additional Rebate" to be selected on the Customer Facing Quote?</span>
+            <span class="toggle off"><span class="knob"></span><span class="lbl">NO</span></span>
+          </div>
+
+          <!-- Lending institutions -->
+          <div class="row">
+            <div class="q mb-3">Allow your team the ability to change lending institutions for Finance and Leasing?</div>
+            <div class="flex items-center gap-10">
+              <div class="flex items-center gap-3"><span class="text-[13px] font-semibold text-[#0F1D3A]">Finance</span><span class="toggle on"><span class="knob"></span><span class="lbl">YES</span></span></div>
+              <div class="flex items-center gap-3"><span class="text-[13px] font-semibold text-[#0F1D3A]">Lease</span><span class="toggle on"><span class="knob"></span><span class="lbl">YES</span></span></div>
+            </div>
+          </div>
+
+          <!-- Rate markup -->
+          <div class="row">
+            <div class="q mb-4">Please enter the Finance Rate markup that should be selected by default</div>
+            <div class="grid grid-cols-2 gap-6">
+              <div><label class="inp-lbl">Finance Rate Markup %</label><input class="inp" value="0.001%"></div>
+              <div><label class="inp-lbl">Lease Rate Markup %</label><input class="inp" value="0.001%"></div>
+            </div>
+          </div>
+
+          <!-- Trade vehicle form -->
+          <div class="row flex items-center justify-between">
+            <span class="q">Would you like to show the trade vehicle form on the Quote Builder?</span>
+            <span class="toggle on"><span class="knob"></span><span class="lbl">YES</span></span>
+          </div>
+
+          <!-- Appraise trade-in online -->
+          <div class="row">
+            <div class="q mb-3">Would you like customers to have the ability to appraise their trade-in vehicle online?</div>
+            <div class="flex items-center gap-5">
+              <span class="toggle on"><span class="knob"></span><span class="lbl">YES</span></span>
+              <a class="lnk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Select Trade tool</a>
+            </div>
+          </div>
+
+          <!-- Rate cards -->
+          <div class="row">
+            <div class="q mb-2">Please set your New, CPO, and Used rate cards.</div>
+            <p class="text-[13px] text-[#6B7280] leading-relaxed mb-5 max-w-[420px]">
+              By adding Standard Rates you will be able to make building Quotes faster and provide your customers with a better experience. These rates are not guaranteed to your customers and are OAC.
+            </p>
+
+            <!-- New / CPO / Used tabs -->
+            <div class="flex items-center gap-10 border-b border-[#E5E7EB] mb-5">
+              <button class="text-[14px] font-semibold text-[#16B364] border-b-2 border-[#16B364] pb-2.5 -mb-px">New</button>
+              <button class="text-[14px] text-[#6B7280] pb-2.5">CPO</button>
+              <button class="text-[14px] text-[#6B7280] pb-2.5">Used</button>
+            </div>
+
+            <!-- Make pills -->
+            <div class="flex items-center gap-3 mb-5">
+              <span class="pill sel">Alfa-Romeo</span>
+              <span class="pill">Bmw</span>
+              <span class="pill lnk-blue inline-flex items-center gap-1.5 font-semibold"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Add New Rate Card</span>
+            </div>
+
+            <!-- Rate card table -->
+            <div class="border border-[#E5E7EB] rounded-xl p-5">
+              <div class="text-[14px] font-bold text-[#0F1D3A] mb-4">Make: Alfa-Romeo</div>
+
+              <!-- header -->
+              <div class="grid items-center gap-3 mb-3" style="grid-template-columns: 150px repeat(5, 1fr);">
+                <div class="text-[12px] font-semibold text-[#6B7280]">Credit Scores</div>
+                <div class="text-[12px] font-semibold text-[#6B7280] text-center">24</div>
+                <div class="text-[12px] font-semibold text-[#6B7280] text-center">36</div>
+                <div class="text-[12px] font-semibold text-[#6B7280] text-center">48</div>
+                <div class="text-[12px] font-semibold text-[#6B7280] text-center">60</div>
+                <div class="text-[12px] font-semibold text-[#6B7280] text-center">72</div>
+              </div>
+
+              <!-- row 1 -->
+              <div class="grid items-center gap-3 mb-3" style="grid-template-columns: 150px repeat(5, 1fr);">
+                <div class="flex items-center gap-1.5"><span class="score-cell">800</span><span class="text-[#9CA3AF]">-</span><span class="score-cell">600</span></div>
+                <div class="rate-cell">5.9</div><div class="rate-cell">5.9</div><div class="rate-cell">6.9</div><div class="rate-cell">7.9</div><div class="rate-cell">7.9</div>
+              </div>
+              <!-- row 2 -->
+              <div class="grid items-center gap-3 mb-3" style="grid-template-columns: 150px repeat(5, 1fr);">
+                <div class="flex items-center gap-1.5"><span class="score-cell">599</span><span class="text-[#9CA3AF]">-</span><span class="score-cell">500</span></div>
+                <div class="rate-cell">7.9</div><div class="rate-cell">7.9</div><div class="rate-cell">7.9</div><div class="rate-cell">8.9</div><div class="rate-cell">8.9</div>
+              </div>
+              <!-- row 3 -->
+              <div class="grid items-center gap-3 mb-5" style="grid-template-columns: 150px repeat(5, 1fr);">
+                <div class="flex items-center gap-1.5"><span class="score-cell">499</span><span class="text-[#9CA3AF]">-</span><span class="score-cell">400</span></div>
+                <div class="rate-cell">8.9</div><div class="rate-cell">9.9</div><div class="rate-cell">9.9</div><div class="rate-cell">9.9</div><div class="rate-cell">9.9</div>
+              </div>
+
+              <!-- table controls -->
+              <div class="flex items-center justify-between pt-2">
+                <div class="flex items-center gap-8">
+                  <div class="flex items-center gap-2">
+                    <span class="step-btn">−</span><span class="step-btn">+</span>
+                    <span class="text-[12px] text-[#6B7280] ml-1">Term Length</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="step-btn">−</span><span class="step-btn">+</span>
+                    <span class="text-[12px] text-[#6B7280] ml-1">Credit Range</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-5 text-[12px]">
+                  <a class="text-[#2563EB] font-semibold">Edit</a>
+                  <a class="text-[#6B7280] font-semibold">Clone</a>
+                  <a class="text-[#DC2626] font-semibold">Delete</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- END CARD -->
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════════════════════ FOOTER ACTION BAR ═══════════════════════ -->
+  <div class="fixed bottom-0 left-[200px] right-0 bg-white border-t border-[#E5E7EB] px-8 py-3">
+    <div class="max-w-[860px] mx-auto flex items-center justify-end gap-4">
+      <button class="text-[14px] font-semibold text-[#6B7280] px-4">Previous</button>
+      <button class="text-[14px] font-semibold text-[#0F1D3A] border border-[#D1D5DB] rounded-lg px-7 py-2.5">Save</button>
+      <button class="text-[14px] font-semibold text-white bg-[#16B364] rounded-lg px-7 py-2.5">Save &amp; Continue</button>
+    </div>
+  </div>
+
+  <!-- Interactive toggles (prototype behavior: flip state + reveal pricing line items) -->
+  <script>
+    document.querySelectorAll('.toggle-btn').forEach(function (t) {
+      t.style.cursor = 'pointer';
+      t.addEventListener('click', function () {
+        var on = !t.classList.contains('on');
+        t.classList.toggle('on', on);
+        t.classList.toggle('off', !on);
+        t.querySelector('.lbl').textContent = on ? 'YES' : 'NO';
+        t.setAttribute('aria-checked', String(on));
+        if (t.dataset.target) {
+          document.getElementById(t.dataset.target).style.display = on ? '' : 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
